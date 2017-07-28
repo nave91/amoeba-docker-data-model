@@ -1,11 +1,21 @@
+# import necessary packages
+import shapley_value
+import pandas as pd
+import numpy as np
+import sqlalchemy
+import itertools
+import re
+import os
+import datetime
+
 # connect to the database
 try:
-    conn = pg.connect("dbname='bellhops_production' user='analyst' host='data-warehouse.cfunpmztfz0m.us-east-1.rds.amazonaws.com' password='IHbRv5vKk5bOxdIHpU'")
+    conn = sqlalchemy.create_engine(os.environ['GOSPEL_DB_URL'])
 except:
     print ("Unable to connect to the database")
 
 # get the customers' booking journey
-journey = psql.read_sql_query('SELECT channel_journey, market_id, AVG(revenue) AS avg_of_revenue_from_channel_journey FROM (SELECT DISTINCT user_id, market_id, revenue_top_line_revenue AS revenue, string_agg(DISTINCT channel, \',\' ORDER BY channel) AS channel_journey FROM zzz_dbt_test_abraar.touches_interpolated GROUP  BY 1, 2, 3) a GROUP BY channel_journey, market_id', conn)
+journey = pd.read_sql('SELECT channel_journey, market_id, AVG(revenue) AS avg_of_revenue_from_channel_journey FROM (SELECT DISTINCT user_id, market_id, revenue_top_line_revenue AS revenue, string_agg(DISTINCT channel, \',\' ORDER BY channel) AS channel_journey FROM zzz_dbt_test_abraar.touches_interpolated GROUP  BY 1, 2, 3) a GROUP BY channel_journey, market_id', conn)
 rev_journey = journey.dropna()
 
 def channel_and_revs(df=mrkt_rev_journey, c_one='channel_journey', c_two='avg_of_revenue_from_channel_journey'):
@@ -147,4 +157,4 @@ for x in list(np.unique(rev_journey['market_id'])):
     s_c(lst=channels)
     shapley_computation(lst_one=channels_att, lst_two=money_from_channels_att, lst_three=single_chs)
     shap_intro(diction=shapley_v, mrkt_id=x)
-    df.to_sql(name='fair_attribution', con=conn, schema='zzz_dbt_test_abraar', if_exists='append')
+    df.to_sql(name='fair_attribution', con=conn, schema='DOCKER_ML_OUTPUT_SCHEMA', if_exists='append')

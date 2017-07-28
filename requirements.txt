@@ -1,4 +1,9 @@
 pandas
 scikit-learn
 sqlalchemy
-psycopg2
+pandas
+numpy
+itertools
+re
+os
+datetime
