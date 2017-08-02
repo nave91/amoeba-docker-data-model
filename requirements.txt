@@ -1,9 +1,5 @@
-pandas
-scikit-learn
-sqlalchemy
-pandas
-numpy
-itertools
-re
-os
-datetime
+pandas==0.20.2
+numpy==1.12.1
+sqlalchemy==1.1.10
+sklearn==0.18.2
+re==2.2.1
